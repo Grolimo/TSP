@@ -1,0 +1,14 @@
+﻿any						=   (*)
+anyexceptstrlimiters	=   (* - '")
+alpha					=	_ a..z A..Z
+number					=   0..9
+float					= number . number
+string					= '|" anyexceptstrlimiters '|"
+identifier				= alpha
+keyword                 = if elif else unset halt break foreach while
+constant				= string | float | number | nil
+call					= identifier ( arguments )
+type                    = array char float long nil (params) (record) string (variable)
+variable                = alpha [alpha|number]*
+index					= [string|number]
+arguments				= ([identifier [, identifier]*])

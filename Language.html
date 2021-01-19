@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Project: Language</title>
+    <link rel="stylesheet" type="text/css" href="documentation.css">
+</head>
+<body class="theme-light">
+    <p>The language project contains the new programming language called "The Simple Language" or TSL for short. It is a simplified programming language with very few instructions so it's easy to learn.</p>
+    <p>
+        The Simple Language (TSL) is as the title implies a simple programming language.<br>
+        It consists of a limited amount of instructions.<br>
+        TSL is case sensitive, its keywords are always in lowercase.<br>
+        Currently TSL is in alpha testing phase. The back end is currently an interpreter, the end goal is to have a 
+        fully fledged compiler to go along with that.<br>
+        There will be changes and addittions to the language, however most if not all will be done through libraries leaving it as lightweight as possible.
+    </p>
+
+    <p>
+        TSL currently supports the following instructions:
+    </p>
+    <ul>
+        <li>if/else/elif</li>
+        <li>foreach</li>
+        <li>while</li>
+        <li>break</li>
+        <li>halt</li>
+        <li>unset</li>
+    </ul>
+    <p>If/else/elif are used for brancing code.</p>
+    <p>foreach and while are used for loops</p>
+    <p>Break and halt are used to control program flow</p>
+    <p>Unset is used to delete a variable from the current scope.</p>
+    <p></p>
+    <p>Variables can be used to store any type of data. </p>
+    <p>The language also supports records and array data types.</p>
+    <p>In order to define a record or an array you have to "create" the variables as such:</p>
+    <pre>
+
+        var_a = array;
+        var_b = record;
+    </pre>
+    <p>Adding new items to a record and reading them back is done as follows:</p>
+    <pre>
+
+        var_b["demo"] = 42;
+        var_c = var_b["demo"];
+        var_b["demo"] += 1;
+    </pre>
+    <p>In above example var_c will contain the value 42, while var_b["demo"] will contain the value 43.</p>
+    <p>To add a new value to an array:</p>
+    <pre>
+
+        var_a[] = 42;
+    </pre>
+    <p>
+        Arrays are zero indexed, meaning that the first entry in the array is accessed
+        using the below command:
+    </p>
+    <pre>
+
+        var_d = var_a[0];
+        var_a[0] *= 2;
+    </pre>
+    <p>
+        In the above example var_d will contain the value of 42, while var_a[0] will contain the value of 84.
+        The 4 basic arithmatic operators +, -, * and / can be used in conjunction with = to assign to the variable 
+        on the left with a value that is comprised of the given aritmatic operator and the value on he right side of =.
+    </p>
+    <p>
+        TSL also has methods/procedures and functions. The only difference between a method and a function is that the function has a return value.<br>
+        In TSL currently you cannot define methods or functions in code. Methods and functions can currently only be provided by libraries.<br>
+        Currently only the System library exists and it contains 1 function and 1 method. <br>
+        Console is the method with which you can output data to the console (CLI).
+        Length is the function with which you can get the length/count of characters/items in arrays, records, strings etc.
+        <pre>
+
+            a = "is the answer to Life, The Universe and ..";
+            console(length(a), a, "Everything!");
+        </pre>
+        This results in the following output:
+        <div class="console_output">
+            <pre>
+
+        42 is the answer to Life, The Universe and .. Everything!
+        Interpreter ran successfully.
+            </pre>
+        </div>
+        <br>
+        The example above shows how functions, variables and constants can be passed as arguments to functions and methods.
+    </p>
+
+    <p>
+        The following example shows most aspects of TSL together:
+        <pre>
+
+            \\ Language structural demo
+
+            console("This demo shows how various language constructs of TSL work.");
+            a = array;
+            a[]=1; a[]=4; a[] = 5; a[] = 9;
+
+            foreach a {
+                if it >= 5 {
+                    console("it > 5:",it);
+                }
+            }
+
+            i=2;
+            while i > 0 {
+                if a[i] == 5 {
+                    console("five");
+                } elif a[i] < 5 and a[i] > 3 {
+                    console(a[i]);
+                } else {
+                    break;
+                }
+                console("index:",i);
+                i-=1;
+            }
+
+            console(i, "Finished!");
+        </pre>
+    </p>
+    <p>
+        The first part of the above demo sets up an array with some values.
+        It then uses the foreach iterator to iterate over all items in the array.
+        Upon each iteration the variable "it", that only exists within the scope of the foreach block, contains the value of the current element in the array.
+    </p>
+    <p>
+        Foreach can be done with arrays, strings and records. When passing a string it will treat the string as if it was an array of individual characters in each element of the array.
+        With records it's a bit special as it won't actually have the value of the element but rather the value of the current index.
+        The next example will show this.
+    </p>
+    <p>
+        Within the foreach block an if statement is checking if the value in it is larger than 5, and if so it will output the text "it > 5" followed by the actual value of it to the console.
+    </p>
+    <p>
+        The second part of the demo sets a variable to the value of 2 which is used as an index for the array in variable a.
+        Then it uses a while loop to start iterating on the condition that is checked at the start at each iteration.
+        In this case the condition will verify if variable i is greater than 5.
+    </p>
+    <p>
+        Within the while block there is another if statement, but in this case it has multiple levels, namely the if condition itself, an elif condition and finally an else that 
+        is branched to if none of the other conditions match. An if statement can be followed by any number of elif statements but it can only have one else statement and the else 
+        must always come after the last elif statement (or directly after the if, in case there is no elif).
+    </p>
+    <p>
+        In the elif condition you see that it actually consists of two conditions that are logically compared using the boolean operator and.
+        The boolean operator and compares if both the left and the right equation are true before it returns true.
+        If either equation returns false the result will be false. Please note that TSL does what is known as a full boolean evaluation.
+        This means that it will verify and evaluate both the left and the right terms. This differs from C/C++ that would normally return false if the first term equates to false.
+    </p>
+    <p>
+        If neither the if condition nor the elif condition match, the else block is executed. In this demo it consists of a break statement.
+        The break statement can be used inside iteration loops (while and foreach) to immediately terminate the loop.
+        While it does terminate the current loop, the application still will continue to run.
+    </p>
+    <p>
+        At the end of the while block the value of the index variable is displayed on the console and it 
+        is decremented by 1. The notation "i-=1;" can also be read/written as "i = i - 1;" but this is more compact and therefore less errorprone.
+        Below you will see what the output of the demo on the console is:
+    </p>
+    <div class="console_output">
+        <pre>
+
+            This demo shows how various language constructs of TSL work.
+            it > 5: 5
+            it > 5: 9
+            five
+            index: 2
+            4
+            index: 1
+            0 Finished!
+            Interpreter ran successfully.
+        </pre>
+    </div>
+    <p>
+        The final two instructions in TLS are halt and unset.<br>
+        Unset is really only intended for debugging purposes.<br>
+        It deletes the given variable from the current scope.<br>
+        <br>
+        With the halt instruction the execution of the application is terminated at that point. No further instructions are executed afer halt.<br>
+        Halt can be given a single integer number as parameter. This value is used to set the exitcode variable.<br>
+        If no number is given, 0 as value is assumed.
+    </p>
+</body>
+</html>

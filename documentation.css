@@ -1,0 +1,121 @@
+﻿body
+{
+    font-family: Arial;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.theme-light, :root {
+    --theme-text: #171717;
+    --theme-text-subtle: #5e5e5e;
+    --theme-text-invert: white;
+    --theme-text-glow-high-contrast: #171717;
+    --theme-box-shadow-light: rgba(0,0,0,0.108);
+    --theme-box-shadow-medium: rgba(0,0,0,0.132);
+    --theme-box-shadow-heavy: rgba(0,0,0,0.18);
+    --theme-box-shadow-extra-heavy: rgba(0,0,0,0.22);
+    --theme-overlay: rgba(0,0,0,0.7);
+    --theme-overlay-invert: white;
+    --theme-body-background: white;
+    --theme-body-background-medium: #fafafa;
+    --theme-body-background-dark: #f2f2f2;
+    --theme-border: #e3e3e3;
+    --theme-table-header: #e3e3e3;
+    --theme-table-row-header: #fafafa;
+    --theme-table-border-dark: #c7c7c7;
+    --theme-hover-base: #2e2e2e;
+    --theme-hover-invert: #fafafa;
+    --theme-border-white-high-contrast: rgba(255,255,255,0);
+    --theme-border-yellow-high-contrast: rgba(0,0,0,0);
+    --theme-code-highlight-background: #fff1cc;
+    --theme-visited: #660099;
+    --theme-score-low-off: rgba(218,59,1,0.3);
+    --theme-score-low: #da3b01;
+    --theme-score-medium-off: rgba(255,187,0,0.3);
+    --theme-score-medium: #ffbb00;
+    --theme-score-high-off: rgba(18,135,18,0.3);
+    --theme-score-high: #128712;
+    --theme-primary-base: #0065b3;
+    --theme-primary-background: #e0f2ff;
+    --theme-primary-background-glow-high-contrast: #e0f2ff;
+    --theme-primary-dark: #002b4d;
+    --theme-primary-hover: #00518f;
+    --theme-primary-active: #003a66;
+    --theme-primary-box-shadow: rgba(0,101,179,0.3);
+    --theme-primary-invert: white;
+    --theme-secondary-base: #ababab;
+    --theme-secondary-background: #e3e3e3;
+    --theme-secondary-background-glow-high-contrast: #e3e3e3;
+    --theme-secondary-dark: #2e2e2e;
+    --theme-secondary-hover: #c7c7c7;
+    --theme-secondary-active: #c7c7c7;
+    --theme-secondary-box-shadow: rgba(0,0,0,0.3);
+    --theme-secondary-invert: black;
+    --theme-tertiary-base: #454545;
+    --theme-tertiary-background: #171717;
+    --theme-tertiary-background-glow-high-contrast: #171717;
+    --theme-tertiary-dark: #e3e3e3;
+    --theme-tertiary-hover: #5e5e5e;
+    --theme-tertiary-active: #757575;
+    --theme-tertiary-box-shadow: rgba(0,101,179,0.3);
+    --theme-tertiary-invert: white;
+    --theme-success-base: #128712;
+    --theme-success-background: #d2f9d2;
+    --theme-success-background-glow-high-contrast: #d2f9d2;
+    --theme-success-dark: #094409;
+    --theme-success-hover: #0f710f;
+    --theme-success-active: #0c5a0c;
+    --theme-success-box-shadow: rgba(18,135,18,0.3);
+    --theme-success-invert: white;
+    --theme-info-base: #8763c5;
+    --theme-info-background: #e2daf1;
+    --theme-info-background-glow-high-contrast: #e2daf1;
+    --theme-info-dark: #38225d;
+    --theme-info-hover: #7045ba;
+    --theme-info-active: #53338a;
+    --theme-info-box-shadow: #e2daf1;
+    --theme-info-invert: white;
+    --theme-inline-code: #e3e3e3;
+    --theme-warning-base: #ffbb00;
+    --theme-warning-background: #fff1cc;
+    --theme-warning-background-glow-high-contrast: #fff1cc;
+    --theme-warning-dark: #664b00;
+    --theme-warning-hover: #cc9600;
+    --theme-warning-active: #997000;
+    --theme-warning-box-shadow: rgba(255,187,0,0.3);
+    --theme-warning-invert: black;
+    --theme-danger-base: #da3b01;
+    --theme-danger-background: #ffdacc;
+    --theme-danger-background-glow-high-contrast: #ffdacc;
+    --theme-danger-dark: #651b01;
+    --theme-danger-hover: #b23001;
+    --theme-danger-active: #7f2201;
+    --theme-danger-box-shadow: rgba(218,59,1,0.3);
+    --theme-danger-invert: white;
+    --theme-facepile-red: #da3b01;
+    --theme-facepile-teal: #008575;
+    --theme-facepile-blue: #0065b3;
+}
+
+.console_output {
+    min-height: 64px;
+    width: 720px;
+    margin-left: 16px;
+}
+
+pre {
+    font-family: Consolas;
+    box-sizing: content-box;
+    background-color: hsla(0,0%,95%,1);
+    background-color: var(--theme-body-background-dark);
+    color: hsla(0,0%,9%,1);
+    color: var(--theme-text);
+    display: flex;
+    flex-direction: row;
+    font-size: 1rem;
+    border: 1px solid hsla(0,0%,89%,1);
+    border: 1px solid var(--theme-border);
+    border-bottom: 0;
+    margin-top: 16px;
+    min-height: 30px;
+}

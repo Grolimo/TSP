@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Marco Caspers</Authors>
+    <Product>The Simple Language</Product>
+    <Description>TSL
+MPL - 2.0</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Copyright>Copyright 2020-2021 Marco Caspers</Copyright>
+    <AssemblyVersion>0.5.0.1</AssemblyVersion>
+    <FileVersion>0.5.0.1</FileVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageIcon></PackageIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ast\AstAssign.cs" />
+    <Compile Remove="ast\AstBase.cs" />
+    <Compile Remove="ast\AstBreak.cs" />
+    <Compile Remove="ast\AstCall.cs" />
+    <Compile Remove="ast\AstElIf.cs" />
+    <Compile Remove="ast\AstElse.cs" />
+    <Compile Remove="ast\AstExpression.cs" />
+    <Compile Remove="ast\AstForEach.cs" />
+    <Compile Remove="ast\AstFunction.cs" />
+    <Compile Remove="ast\AstHalt.cs" />
+    <Compile Remove="ast\AstIf.cs" />
+    <Compile Remove="ast\AstIndex.cs" />
+    <Compile Remove="ast\AstLambda.cs" />
+    <Compile Remove="ast\AstMethod.cs" />
+    <Compile Remove="ast\AstScope.cs" />
+    <Compile Remove="ast\AstUnset.cs" />
+    <Compile Remove="ast\AstVariable.cs" />
+    <Compile Remove="ast\AstVarType.cs" />
+    <Compile Remove="ast\AstWhile.cs" />
+    <Compile Remove="ast\Ast_Array.cs" />
+    <Compile Remove="ast\Ast_Params.cs" />
+    <Compile Remove="ast\Ast_Record.cs" />
+    <Compile Remove="Dijkstra.cs" />
+    <Compile Remove="libraries\LibCall.cs" />
+    <Compile Remove="libraries\LibCallType.cs" />
+    <Compile Remove="ParameterObject.cs" />
+    <Compile Remove="ScopeObject.cs" />
+    <Compile Remove="Variable.cs" />
+    <Compile Remove="VarType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Editor\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>

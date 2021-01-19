@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Project: SimpleConfiguration</title>
+    <link rel="stylesheet" type="text/css" href="documentation.css">
+</head>
+<body class="theme-light">
+    <p>
+        The SimpleConfiguration project is to provide a very simple library that can be used for reading and writing configuration files.
+    </p>
+    <p>
+        Configuration is the central class for this library, it's a static class so no need to instantiate anything.<br><br>
+        The configuration is stored in a JSon File that can be loaded with the Load method that takes the file path as a parmater.<br>
+        When the configuration has changed it can be saved with the Save method.<br>
+        In case a copy/backup is needed there is the SaveAs method that has the file path as a parameter.<br>
+    </p>
+    <p>
+        The configuration itself can be acessed through the Sections property.
+        It is a fully implemented collection, but it also has an array like accessor.
+        The array accessor type is the easiest way of working it.
+        
+        Example:</p>
+    <div>
+        <pre>
+                <b>var</b> KeyNameSection = Configuration.Sections["keyname"];
+        </pre>
+    </div>
+    <p>
+        If a section with keyname didn't exit yet, one is created and added to the collection automatically.
+    </p>
+    <p>
+        A section can have one or more items. Items is like sections a fully implemented collection with array accessors.
+        An example of getting a specific named item from the section is:
+        <pre>
+
+                <b>var</b> Item = KeyNameSection.Items["itemname"];
+        </pre>
+        If an Item with itemname didn't exist before it is automatically created and added to the section.
+    </p>
+    <p>
+        The configuration item has a Value property which is a string.
+        An example of getting the value of the item is:
+        <pre>
+
+            string Value = Item.Value;
+        </pre>
+
+        Setting the value of the item is as simple as assigning to the value:
+        <pre>
+
+            Item.Value = "new value";
+        </pre>
+    </p>
+    <p>
+        It is also very possible to directly access and manipulate the value of an item in this way:
+        <pre>
+
+            string oldvalue = Configuration.Sections["section"]["item"].Value;
+            Configuration.Sections["section"]["item"].Value = $"new_{oldvalue}";
+        </pre>
+        Don't forget to call Configuration.Save() or Configuration.SaveAs("filename") to store the configuration changes.
+    </p>
+</body>
+</html>

@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Project: Editor</title>
+</head>
+<body>
+    <p>
+        The editor application is a Windows destkop application that allows editting of source files as well as debugging with the interpreter.<br>
+        It is intended to be ran from Visual Studio for debugging purposes.
+    </p>
+    <p>
+        Under the edit menu item there's a configuration item (Options) that enables configuration of:
+        <ul>
+            <li>The default location for source files.
+            <li>The default file extension for source files.
+            <li>Enabling debug mode.
+        </ul> 
+    </p>
+    <p>
+        Setting the default source file location will cause the open/save/as options to initally start in this folder.
+    </p>
+    <p>
+        Setting the default file extension sets the filename of a newly created file to "new.&lt;fileextension&gt".
+    </p>
+    <p>
+        Enabling debug mode is intended for the test case where the editor is being debugged from Visual Studio.<br>
+        With debug mode enabled, exceptions are not caught in a try/catch block causing Visual Studio to break <br>
+        execution at the location where the exception occurs, allowing for a better debugging experience.<br>
+    </p>
+    <p>
+        The editor is a simple text editor with line numbers showing. <br>
+        The text in the editor can be saved and new text can be loaded from files.<br>
+        Text can be searched through with the standard find (Ctrl-F) text searcher.<br>
+        If multiple ocurrances existed F3 will search for the next matching text part.<br>
+    </p>
+    <p>
+        At the bottom of the editor there are 4 tabs containing the below information if the file was executed through debug/debug.
+        <ul>
+            <li>Output -&gt; Shows the output of the interpreter.
+            <li>Ast Tree -&gt; Shows the AST tree created by the parser.
+            <li>Scope Tree -&gt; Shows the tree of scopes detected/created by the interpreter.
+            <li>Lexer output -&gt; Shows the list of tokens that were created by the lexer.
+        </ul>
+    </p>
+</body>
+</html>
