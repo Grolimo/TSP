@@ -14,3 +14,10 @@ Missing features:
 - Structs.
 - Library/(sub)file inclusion from code.
 - Compiler.
+
+Documentation can be found here:
+https://www.0xc007.nl/Simple.html
+
+Please note that the docs are a bit older than the actual implementation although no real 
+changes where made to the language itself, it's implementation has changed.
+
