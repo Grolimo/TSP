@@ -19,7 +19,7 @@ namespace Language
             libs.Add(new LibrarySystem());
 
             Parser = new Parser(libs);
-            State = new ParserState(libs, sourceCode);
+            State = new ParserState(sourceCode);
 
             Parser.GetAst(Parser.Root, State);
             Parser.Root.Execute();

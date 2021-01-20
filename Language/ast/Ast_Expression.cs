@@ -10,74 +10,7 @@ namespace Language
 {
     public class Ast_Expression : Ast_Base
     {
-        public Ast_Expression(Token token) : base(token)
-        {
-
-        }
-
-        private static dynamic GetValue(Ast_Base ast, Ast_Scope scope, Libraries libraries)
-        {
-            if (ast.Type == AstType.Constant)
-            {
-                return ast.Token.Lexeme;
-            }
-
-            if (ast.Type == AstType.Variable)
-            {
-                Ast_Variable variable = ast as Ast_Variable;
-                Ast_Variable v = scope.GetVariable(ast.Token.Lexeme);
-                dynamic value;
-                if (variable.Index != null)
-                {
-                    value = v.DoGetValue(variable.Index, scope, libraries);
-                }
-                else
-                {
-                    value = v.DoGetValue();
-                }
-
-                if (variable.Index != null)
-                {
-                    v.Index = null;
-                    //value = value.Value;
-                }
-                return value;
-            }
-
-            if (ast.Type == AstType.Type)
-            {
-                if (ast.Token.Lexeme == "array" || ast.Token.Lexeme == "record")
-                {
-                    return $"[[---NEW{ast.Token.Lexeme}/NEW---]]";
-                }
-                else
-                {
-                    throw new RuntimeError(ast.Token, $"Unknown ast Type: {ast.Token.Lexeme}");
-                }
-            }
-            if (ast.Type == AstType.Call)
-            {
-                if (ast is Ast_Call)
-                {
-                    var call = ast as Ast_Call;
-                    if (call?.CallType == CallType.Function)
-                    {
-                        return call.Execute(scope, libraries);
-                    }
-                    else
-                    {
-                        throw new RuntimeError(ast.Token, $"Procedure can not be used as a function. ({call.Name})");
-                    }
-                }
-                else
-                {
-                    throw new RuntimeError(ast.Token, "Invalid call type");
-                }
-            }
-            throw new RuntimeError(ast.Token, $"Unknown value type: {ast.Type}.");
-        }
-
-        private static readonly Dictionary<string, KeyValuePair<int, string>> precedenceTable =
+        public static readonly Dictionary<string, KeyValuePair<int, string>> precedenceTable =
             new Dictionary<string, KeyValuePair<int, string>>
         {
             {"(", new KeyValuePair<int, string>(10, "left")},
@@ -99,14 +32,103 @@ namespace Language
             {")", new KeyValuePair<int,string>(0, "left")},
         };
 
-        private static readonly List<TokenType> Operands = new List<TokenType>
-            { TokenType.OpPower, TokenType.OpMultiply, TokenType.OpDivide, TokenType.OpAdd, TokenType.OpSubtract,
-                TokenType.OpLT, TokenType.OpLTE, TokenType.OpGT, TokenType.OpGTE, TokenType.OpEqual, TokenType.OpNE,
-                TokenType.OpNot };
+        public static readonly List<TokenType> Operands = new List<TokenType> { 
+            TokenType.OpPower, 
+            TokenType.OpMultiply, 
+            TokenType.OpDivide, 
+            TokenType.OpAdd, 
+            TokenType.OpSubtract,
+            TokenType.OpLT, 
+            TokenType.OpLTE, 
+            TokenType.OpGT, 
+            TokenType.OpGTE, 
+            TokenType.OpEqual, 
+            TokenType.OpNE,
+            TokenType.OpNot };
 
-        private static readonly List<TokenType> constants = new List<TokenType>
-            { TokenType.ConstantString, TokenType.FormatString, TokenType.ConstantNumber,
-                TokenType.ConstantBool, TokenType.ConstantNil };
+        public static readonly List<TokenType> Constants = new List<TokenType> {
+            TokenType.ConstantArray,
+            TokenType.ConstantBool,
+            TokenType.ConstantNil,
+            TokenType.ConstantNumber,
+            TokenType.ConstantParams,
+            TokenType.ConstantRecord,
+            TokenType.ConstantString,
+            TokenType.FormatString };
+
+        public Ast_Expression(Token token) : base(token)
+        {
+            Type = AstType.Expression;
+        }
+
+        private static dynamic GetValue(Ast_Base ast, Ast_Scope scope)
+        {
+            if (ast.Type == AstType.Constant)
+            {
+                return ast.Token.Lexeme;
+            }
+
+            if (ast.Type == AstType.Variable)
+            {
+                Ast_Variable variable = ast as Ast_Variable;
+                Ast_Variable v = scope.GetVariable(ast.Token.Lexeme);
+                dynamic value;
+                if (variable.Index != null)
+                {
+                    value = v.DoGetValue(variable.Index, scope);
+                }
+                else
+                {
+                    value = v.DoGetValue();
+                }
+
+                if (variable.Index != null)
+                {
+                    v.Index = null;
+                }
+                return value;
+            }
+
+            if (ast.Type == AstType.Type)
+            {
+                if (ast.Token.Lexeme == Ast_Variable.ArrayValue)
+                {
+                    return Ast_Variable.NewArrayValue;
+                }
+                else if (ast.Token.Lexeme == Ast_Variable.RecordValue)
+                {
+                    return Ast_Variable.NewRecordValue;
+                }
+                else if (ast.Token.Lexeme == Ast_Variable.ParamsValue)
+                {
+                    return Ast_Variable.NewParamsValue;
+                }
+                else
+                {
+                    throw new RuntimeError(ast.Token, $"Unknown ast Type: {ast.Token.Lexeme}");
+                }
+            }
+            if (ast.Type == AstType.Call)
+            {
+                if (ast is Ast_Call)
+                {
+                    var call = ast as Ast_Call;
+                    if (call?.CallType == CallType.Function)
+                    {
+                        return call.Execute(scope);
+                    }
+                    else
+                    {
+                        throw new RuntimeError(ast.Token, $"Procedure can not be used as a function. ({call.Name})");
+                    }
+                }
+                else
+                {
+                    throw new RuntimeError(ast.Token, "Invalid call type");
+                }
+            }
+            throw new RuntimeError(ast.Token, $"Unknown value type: {ast.Type}.");
+        }
 
         private static void PushConst(Stack<Ast_Base> stack, dynamic value)
         {
@@ -220,7 +242,7 @@ namespace Language
             return value;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             var s = new Stack<Ast_Base>();
 
@@ -234,23 +256,23 @@ namespace Language
                 dynamic Value = null;
                 if (ast.Type == AstType.Type)
                 {
-                    PushConst(s, Ast_Expression.GetValue(ast, scope, libraries));
+                    PushConst(s, Ast_Expression.GetValue(ast, scope));
                 }
                 else if (ast.Type == AstType.Variable || ast.Type == AstType.Call || ast.Type == AstType.Constant)
                 {
-                    PushConst(s, Ast_Expression.GetValue(ast, scope, libraries));
+                    PushConst(s, Ast_Expression.GetValue(ast, scope));
                 }
                 else if (ast.Type == AstType.BoolOp)
                 {
                     if (ast.Token.Lexeme == "not" && s.Count > 0)
                     {
-                        var left = Ast_Expression.GetValue(s.Pop(), scope, libraries);
+                        var left = Ast_Expression.GetValue(s.Pop(), scope);
                         Value = !left;
                     }
                     else if (s.Count >= 2)
                     {
-                        var right = Ast_Expression.GetValue(s.Pop(), scope, libraries);
-                        var left = Ast_Expression.GetValue(s.Pop(), scope, libraries);
+                        var right = Ast_Expression.GetValue(s.Pop(), scope);
+                        var left = Ast_Expression.GetValue(s.Pop(), scope);
                         Value = ProcessOp(left, ast, right);
                     }
                     else
@@ -260,8 +282,8 @@ namespace Language
                 }
                 else if (Operands.Contains(ast.Token.Type) && s.Count >= 2)
                 {
-                    var right = Ast_Expression.GetValue(s.Pop(), scope, libraries);
-                    var left = Ast_Expression.GetValue(s.Pop(), scope, libraries);
+                    var right = Ast_Expression.GetValue(s.Pop(), scope);
+                    var left = Ast_Expression.GetValue(s.Pop(), scope);
                     Value = ProcessOp(left, ast, right);
                 }
                 else if (ast.Type == AstType.Procedure || ast.Type == AstType.Function)
@@ -286,7 +308,7 @@ namespace Language
                     token.Type == AstType.Variable ||
                     token.Type == AstType.Call)
                 {
-                    var value = Ast_Expression.GetValue(token, scope, libraries);
+                    var value = Ast_Expression.GetValue(token, scope);
                     return value;
                 }
             }

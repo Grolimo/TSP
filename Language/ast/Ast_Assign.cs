@@ -43,9 +43,9 @@ namespace Language
             return sb.ToString();
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
-            dynamic value = Expression.Execute(scope, libraries);
+            dynamic value = Expression.Execute(scope);
             if (value is Ast_Procedure || value is Ast_Function)
             {
                 value = value.Clone(Variable.Token);
@@ -68,28 +68,28 @@ namespace Language
                 dynamic indexedv = null;
                 if (Operand.Type != TokenType.OpAssign)
                 {
-                    indexedv = ScopeVar.DoGetValue(index, scope, libraries);
+                    indexedv = ScopeVar.DoGetValue(index, scope);
                 }
                 switch (Operand.Type)
                 {
                     case TokenType.OpAssign:
-                        ScopeVar.DoSetValue(value, index, scope, libraries);
+                        ScopeVar.DoSetValue(value, index, scope);
                         break;
                     case TokenType.OpAssignAdd:
-                        ScopeVar.DoSetValue(indexedv + value, index, scope, libraries);
+                        ScopeVar.DoSetValue(indexedv + value, index, scope);
                         break;
                     case TokenType.OpAssignDivide:
                         if (value == 0)
                         {
                             throw new RuntimeError(Token, "Division by zero.");
                         }
-                        ScopeVar.DoSetValue(indexedv / value, index, scope, libraries);
+                        ScopeVar.DoSetValue(indexedv / value, index, scope);
                         break;
                     case TokenType.OpAssignMultiply:
-                        ScopeVar.DoSetValue(indexedv * value, index, scope, libraries);
+                        ScopeVar.DoSetValue(indexedv * value, index, scope);
                         break;
                     case TokenType.OpAssignSubtract:
-                        ScopeVar.DoSetValue(indexedv - value, index, scope, libraries);
+                        ScopeVar.DoSetValue(indexedv - value, index, scope);
                         break;
                 }
             }

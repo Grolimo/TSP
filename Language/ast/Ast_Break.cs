@@ -11,7 +11,7 @@ namespace Language
             Type = AstType.Break;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             if (!scope.IsLoop)
             {

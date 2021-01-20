@@ -32,13 +32,13 @@ namespace Language
             return $"procedure {base.ToString()}";
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             scope.Variables.Append(Token.Lexeme, this);
             return false;
         }
 
-        public override dynamic ExecuteCall(Ast_Scope scope, Libraries libraries)
+        public override dynamic ExecuteCall(Ast_Scope scope)
         {
             if (procScope == null)
             {
@@ -52,7 +52,7 @@ namespace Language
             }
             foreach (var instruction in Block)
             {
-                instruction.Execute(procScope, libraries);
+                instruction.Execute(procScope);
             }
             return false;
         }

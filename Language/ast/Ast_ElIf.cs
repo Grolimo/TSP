@@ -18,13 +18,13 @@ namespace Language
             return $"elif {Expression}";
         }
 
-        public dynamic ExecuteElif(Ast_Scope scope, Libraries libraries)
+        public dynamic ExecuteElif(Ast_Scope scope)
         {
             var child = scope.CreateChild($"{scope.Name}->ExecuteElIf");
             dynamic res = false;
             foreach (Ast_Base fi in Block)
             {
-                res = fi.Execute(child, libraries);
+                res = fi.Execute(child);
                 if (res is Ast_Terminate || res == true)
                 {
                     return true;
@@ -33,12 +33,12 @@ namespace Language
             return res;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
-            var value = Expression.Execute(scope, libraries);
+            var value = Expression.Execute(scope);
             if (value == true || (value != null && value != false && value != 0))
             {
-                return ExecuteElif(scope, libraries);
+                return ExecuteElif(scope);
             }
             return false;
         }

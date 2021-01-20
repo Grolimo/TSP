@@ -20,13 +20,13 @@ namespace Language
             return $"if {Expression}";
         }
 
-        public dynamic ExecuteIf(Ast_Scope scope, Libraries libraries)
+        public dynamic ExecuteIf(Ast_Scope scope)
         {
             var child = scope.CreateChild("if.executeif");
             dynamic res = false;
             foreach (Ast_Base fi in Block)
             {
-                res = fi.Execute(child, libraries);
+                res = fi.Execute(child);
                 if (res is Ast_Terminate)
                 {
                     return true;
@@ -35,32 +35,32 @@ namespace Language
             return res;
         }
 
-        public bool ExecuteElifBlock(Ast_Scope scope, Libraries libraries)
+        public bool ExecuteElifBlock(Ast_Scope scope)
         {
             if (ElIf == null) return false;
             foreach (Ast_Base elif in ElIf.Block)
             {
-                if (elif.Execute(scope, libraries))
+                if (elif.Execute(scope))
                     return true;
             }
             return false;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
-            var value = Expression.Execute(scope, libraries);
+            var value = Expression.Execute(scope);
             if (value == true || (value != null && value != false && value != 0))
             {
-                return ExecuteIf(scope, libraries);
+                return ExecuteIf(scope);
 
             }
-            if (ElIf?.Block.Count > 0 && ExecuteElifBlock(scope, libraries))
+            if (ElIf?.Block.Count > 0 && ExecuteElifBlock(scope))
             {
                 return false;
             }
             if (Else?.Block.Count > 0)
             {
-                Else.Execute(scope, libraries);
+                Else.Execute(scope);
             }
             return false;
         }

@@ -10,7 +10,8 @@ namespace Language
     public enum CallType { Function, Procedure, Lambda };
     public class Ast_Call : Ast_Base
     {
-        public CallType CallType;
+        public CallType CallType {get; set; }
+        private readonly Libraries Libraries;
         public string Name
         {
             get
@@ -18,9 +19,10 @@ namespace Language
                 return Token?.Lexeme;
             }
         }
-        public Ast_Call(Token token) : base(token)
+        public Ast_Call(Token token, Libraries libraries) : base(token)
         {
             Type = AstType.Call;
+            Libraries = libraries;
         }
         public override string ToString()
         {
@@ -42,7 +44,7 @@ namespace Language
             return sb.ToString();
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             Ast_Lambda exec;
             if (scope.VariableExists(Name))
@@ -51,8 +53,8 @@ namespace Language
             }
             else
             {
-                exec = libraries.GetMethodOrFunction(Name);
-                exec.Execute(scope, libraries); // run the prepwork.
+                exec = Libraries.GetMethodOrFunction(Name);
+                exec.Execute(scope); // run the prepwork.
             }
             if (exec == null)
             {
@@ -70,7 +72,7 @@ namespace Language
             var i = 0;
             foreach (Ast_Expression expr in Block)
             {
-                var expressionValue = expr.Execute(scope, libraries);
+                var expressionValue = expr.Execute(scope);
 
                 if (exec.Args[i].Value.Type == ValueType.Params)
                 {
@@ -86,9 +88,9 @@ namespace Language
 
             if (exec.Type == AstType.Function || exec.Type == AstType.Procedure)
             {
-                return exec.ExecuteCall(scope, libraries);
+                return exec.ExecuteCall(scope);
             }
-            return exec.Execute(scope, libraries);
+            return exec.Execute(scope);
         }
     }
 }

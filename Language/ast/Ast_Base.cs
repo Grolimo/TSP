@@ -26,7 +26,7 @@ namespace Language
             return string.Empty;
         }
 
-        public abstract dynamic Execute(Ast_Scope scope, Libraries libraries);
+        public abstract dynamic Execute(Ast_Scope scope);
 
     }
 }

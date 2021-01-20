@@ -11,11 +11,11 @@ namespace Language
             Type = AstType.Else;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             foreach (Ast_Base fi in Block)
             {
-                var res = fi.Execute(scope, libraries);
+                var res = fi.Execute(scope);
                 if (res is Ast_Terminate || res == true)
                 {
                     return true;

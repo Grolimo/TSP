@@ -11,48 +11,18 @@ namespace Language
         private readonly List<string> Keywords = new List<string> { "break", "elif", "else", "foreach", "halt", "if", "unset", "while" };
         private readonly List<string> BoolOperands = new List<string> { "and", "not", "or", "xor" };
         private readonly List<string> VariableTypes = new List<string> { "array", "bool", "float", "int", "nil", "record", "string" };
-        private static readonly Dictionary<string, KeyValuePair<int, string>> precedenceTable =
-            new Dictionary<string, KeyValuePair<int, string>>
-        {
-            {"(", new KeyValuePair<int, string>(10, "left")},
-            {"<", new KeyValuePair<int,string>(9, "left")},
-            {">", new KeyValuePair<int,string>(9, "left")},
-            {"<=", new KeyValuePair<int,string>(9, "left")},
-            {">=", new KeyValuePair<int,string>(9, "left")},
-            {"==", new KeyValuePair<int,string>(8, "left")},
-            {"!=", new KeyValuePair<int,string>(8, "left")},
-            {"^", new KeyValuePair<int,string>(7, "right")},
-            {"/", new KeyValuePair<int,string>(6, "left")},
-            {"*", new KeyValuePair<int,string>(6, "left")},
-            {"+", new KeyValuePair<int,string>(5, "left")},
-            {"-", new KeyValuePair<int,string>(5, "left")},
-            {"not", new KeyValuePair<int,string>(4, "unary")},
-            {"and", new KeyValuePair<int,string>(1, "left")},
-            {"xor", new KeyValuePair<int,string>(1, "left")},
-            {"or", new KeyValuePair<int,string>(1, "left")},
-            {")", new KeyValuePair<int,string>(0, "left")},
-        };
+        
+        public readonly Ast_Application Root;
 
-        private static readonly List<TokenType> Operands = new List<TokenType>
-            { TokenType.OpPower, TokenType.OpMultiply, TokenType.OpDivide, TokenType.OpAdd, TokenType.OpSubtract,
-                TokenType.OpLT, TokenType.OpLTE, TokenType.OpGT, TokenType.OpGTE, TokenType.OpEqual, TokenType.OpNE,
-                TokenType.OpNot };
-
-        private static readonly List<TokenType> Constants = new List<TokenType>
-            {
-                TokenType.ConstantString,
-                TokenType.FormatString,
-                TokenType.ConstantNumber,
-                TokenType.ConstantBool,
-                TokenType.ConstantNil,
-                TokenType.ConstantRecord,
-                TokenType.ConstantArray
-            };
-        public Ast_Application Root;
+        private const string ste_InvalidTokenType = "Invalid token type ({0}).";
 
         private readonly Libraries Libraries;
 
-        private const string ste_InvalidTokenType = "Invalid token type ({0}).";
+        public Parser(Libraries libraries)
+        {
+            Libraries = libraries;
+            Root = new Ast_Application();
+        }
 
         private static Token Expect(TokenType type, ParserState state)
         {
@@ -71,12 +41,6 @@ namespace Language
                 throw new SyntaxError(token, string.Format(ste_InvalidTokenType, token.Type));
             }
             return token;
-        }
-
-        public Parser(Libraries libraries)
-        {
-            Libraries = libraries;
-            Root = new Ast_Application { Libraries = libraries };
         }
 
         public void GetAst(IAst node, ParserState state)
@@ -146,7 +110,7 @@ namespace Language
             }
             else if (state.PeekToken().Type == TokenType.BracketLeft)
             {
-                return new Ast_Call(token);
+                return new Ast_Call(token, Libraries);
             }
             else if (VariableTypes.Contains(token.Lexeme))
             {
@@ -200,7 +164,7 @@ namespace Language
                 {
                     ast.Variable.DoSetValue(Ast_Variable.NewParamsValue);
                 }
-                else if (Constants.Contains(ast.Expression.Token.Type))
+                else if (Ast_Expression.Constants.Contains(ast.Expression.Token.Type))
                 {
                     ast.Variable.DoSetValue(ast.Expression.Token.Lexeme);
                 }
@@ -248,7 +212,7 @@ namespace Language
             }
 
             _ = Expect(TokenType.BracketLeft, state);
-            var ast = new Ast_Call(ident.Token);
+            var ast = new Ast_Call(ident.Token, Libraries);
             ParseParameters(ast, state);
             _ = Expect(TokenType.Semicolon, state);
             return ast;
@@ -358,7 +322,7 @@ namespace Language
                         var op = ident;
 
                         while ((s.Count > 0) && (s.Peek().Token.Lexeme != "(") &&
-                            OpPrecedence(precedenceTable[op.Token.Lexeme], precedenceTable[s.Peek().Token.Lexeme]))
+                            OpPrecedence(Ast_Expression.precedenceTable[op.Token.Lexeme], Ast_Expression.precedenceTable[s.Peek().Token.Lexeme]))
                         {
                             var x = s.Pop();
                             ast.Block.Add(x);
@@ -370,13 +334,13 @@ namespace Language
                     }
                     else if (ident.Type == AstType.Call)
                     {
-                        ident = new Ast_Call(ident.Token);
+                        ident = new Ast_Call(ident.Token, Libraries);
                         _ = Expect(TokenType.BracketLeft, state);
                         ParseParameters(ident, state);
                     }
                     ast.Block.Add(ident);
                 }
-                else if (Constants.Contains(token.Type))
+                else if (Ast_Expression.Constants.Contains(token.Type))
                 {
                     Expect(token.Type, state);
 
@@ -409,17 +373,17 @@ namespace Language
                     var fn = ParseLambda(named, state);
                     ast.Block.Add(fn);
                 }
-                else if (Operands.Contains(token.Type))
+                else if (Ast_Expression.Operands.Contains(token.Type))
                 {
                     Expect(token.Type, state);
                     var op = new Ast_Op(token);
-                    if (precedenceTable[op.Token.Lexeme].Value == "unary")
+                    if (Ast_Expression.precedenceTable[op.Token.Lexeme].Value == "unary")
                     {
                         s.Push(op);
                         token = state.PeekToken();
                         continue;
                     }
-                    while (s.Count > 0 && s.Peek().Token.Lexeme != "(" && OpPrecedence(precedenceTable[op.Token.Lexeme], precedenceTable[(s.Peek()).Token.Lexeme]))
+                    while (s.Count > 0 && s.Peek().Token.Lexeme != "(" && OpPrecedence(Ast_Expression.precedenceTable[op.Token.Lexeme], Ast_Expression.precedenceTable[(s.Peek()).Token.Lexeme]))
                     {
                         var x = s.Pop();
                         ast.Block.Add(x);

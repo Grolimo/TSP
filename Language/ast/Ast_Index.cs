@@ -13,13 +13,13 @@ namespace Language
             Type = AstType.Index;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             var res = new List<dynamic>();
             foreach (var expr in Block)
             {
                 Ast_Expression expression = expr as Ast_Expression;
-                res.Add(expression.Execute(scope, libraries));
+                res.Add(expression.Execute(scope));
             }
             return res;
         }

@@ -34,13 +34,13 @@ namespace Language
             return $"function {base.ToString()}";
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             scope.Variables.Append(Token.Lexeme, this);
             return false;
         }
 
-        public override dynamic ExecuteCall(Ast_Scope scope, Libraries libraries)
+        public override dynamic ExecuteCall(Ast_Scope scope)
         {
             if (funcScope == null)
             {
@@ -54,7 +54,7 @@ namespace Language
             funcScope.Variables.Append(ReturnVariable.Token.Lexeme, null);
             foreach (var instruction in Block)
             {
-                instruction.Execute(funcScope, libraries);
+                instruction.Execute(funcScope);
             }
             return funcScope.Variables[ReturnVariable.Token.Lexeme].DoGetValue();
         }

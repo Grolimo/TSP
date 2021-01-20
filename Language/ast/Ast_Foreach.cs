@@ -34,7 +34,7 @@ namespace Language
             return (value is Dictionary<string, KeyValuePair<string, dynamic>>);
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             if (Block.Count == 0) return false; // Gatekeeper, don't run if there are no instructions in the block.
             dynamic containerValue = GetContainerValue(scope);
@@ -45,19 +45,19 @@ namespace Language
             childScope.Variables.Add(it);
             if (containerValue is string)
             {
-                ExecuteForeachLoop(containerValue, childScope, it, libraries);
+                ExecuteForeachLoop(containerValue, childScope, it);
             }
             else if (containerValue.Type == AstType.Variable && containerValue.Value.Type == ValueType.Record)
             {
-                ExecuteForeachLoop(containerValue.Value.Value.Keys, childScope, it, libraries);
+                ExecuteForeachLoop(containerValue.Value.Value.Keys, childScope, it);
             }
             else if (containerValue.Type == AstType.Variable && containerValue.Value.Type == ValueType.Array)
             {
-                ExecuteForeachLoop(containerValue.Value.Value, childScope, it, libraries);
+                ExecuteForeachLoop(containerValue.Value.Value, childScope, it);
             }
             else if (containerValue.Type == AstType.Variable && containerValue.Value.Type == ValueType.String)
             {
-                ExecuteForeachLoop(containerValue.Value.Value, childScope, it, libraries);
+                ExecuteForeachLoop(containerValue.Value.Value, childScope, it);
             }
             else
             {
@@ -67,7 +67,7 @@ namespace Language
             childScope.Variables.Remove(it);
             return false;
         }
-        private void ExecuteForeachLoop(dynamic container, Ast_Scope currentScope, Ast_Variable it, Libraries libraries)
+        private void ExecuteForeachLoop(dynamic container, Ast_Scope currentScope, Ast_Variable it)
         {
             foreach (var fo in container)
             {
@@ -81,7 +81,7 @@ namespace Language
                 }
                 foreach (var fi in Block)
                 {
-                    var res = fi.Execute(currentScope, libraries);
+                    var res = fi.Execute(currentScope);
                     if (res is Ast_Terminate || res == true)
                     {
                         break;

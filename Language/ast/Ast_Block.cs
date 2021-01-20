@@ -11,13 +11,13 @@ namespace Language
             Type = AstType.Block;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             Ast_Scope blockScope = scope.CreateChild("block");
             dynamic result = false;
             foreach (var instruction in Block)
             {
-                result = instruction.Execute(blockScope, libraries);
+                result = instruction.Execute(blockScope);
                 if (result is Ast_Terminate)
                 {
                     break;

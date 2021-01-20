@@ -28,13 +28,13 @@ namespace Language
                 Args.Add(variable);
             }
 
-            public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+            public override dynamic Execute(Ast_Scope scope)
             {
                 Args[0]?.Value?.Value?.Clear();
                 return false;
             }
 
-            public override dynamic ExecuteCall(Ast_Scope scope, Libraries libraries)
+            public override dynamic ExecuteCall(Ast_Scope scope)
             {
                 var argLst = Args[0].Value.Value;
                 var sb = new StringBuilder();
@@ -47,7 +47,7 @@ namespace Language
                         dynamic value;
                         if (variable.Index != null)
                         {
-                            value = variable.DoGetValue(variable.Index, scope, libraries);
+                            value = variable.DoGetValue(variable.Index, scope);
                         }
                         else
                         {
@@ -77,12 +77,12 @@ namespace Language
                 Args.Add(new Ast_Variable(new Token { Lexeme = "arg" }));
             }
 
-            public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+            public override dynamic Execute(Ast_Scope scope)
             {
                 return false;
             }
 
-            public override dynamic ExecuteCall(Ast_Scope scope, Libraries libraries)
+            public override dynamic ExecuteCall(Ast_Scope scope)
             {
                 if (Args?.Count != 1)
                 {

@@ -8,8 +8,6 @@ It can be used for a "functional programming" style.
 
 Variable type is set on assignment.
 
-Current version is 0.5.0.1
-
 Missing features:
 - Structs.
 - Library/(sub)file inclusion from code.

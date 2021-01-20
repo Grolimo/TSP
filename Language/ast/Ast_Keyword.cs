@@ -13,7 +13,7 @@ namespace Language
             Type = AstType.Keyword;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             throw new NotImplementedException();
         }

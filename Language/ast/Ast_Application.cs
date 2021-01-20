@@ -10,13 +10,12 @@ namespace Language
     {
         public List<Ast_Base> Block { get; set; } = new List<Ast_Base>();
         public Ast_Scope Scope = new Ast_Scope("Application Scope", null);
-        public Libraries Libraries;
 
         public void Execute()
         {
             foreach (var instruction in Block)
             {
-                var result = instruction.Execute(Scope, Libraries);
+                var result = instruction.Execute(Scope);
                 if (result is Ast_Terminate)
                 {
                     break;

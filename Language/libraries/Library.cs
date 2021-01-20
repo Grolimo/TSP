@@ -11,7 +11,7 @@ namespace Language
     {
         bool Contains(string name);
         void Add(Ast_Lambda lambda);
-        dynamic Execute(Ast_Scope scope, Libraries libraries);
+        dynamic Execute(Ast_Scope scope);
     }
 
     public class Library : ILibrary
@@ -26,7 +26,7 @@ namespace Language
             Items.Add(lambda);
         }
 
-        public virtual dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public virtual dynamic Execute(Ast_Scope scope)
         {
             throw new RuntimeError(Token.ErrorToken, "Execute function not implemented.");
         }

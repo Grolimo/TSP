@@ -6,16 +6,13 @@ namespace Language
 {
     public class ParserState
     {
-        public Libraries Libraries;
-        public Ast_Scope Scope;
+        public Ast_Scope Scope = new Ast_Scope("root", null);
         private readonly LexerState State;
         public bool EOF => State.EOF;
 
 
-        public ParserState(Libraries libraries, string source)
+        public ParserState(string source)
         {
-            Libraries = libraries;
-            Scope = new Ast_Scope("root", null);
             State = new LexerState(source);
         }
 

@@ -18,9 +18,9 @@ namespace Language
             return $"halt {Exitcode}";
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
-            var value = Exitcode.Execute(scope, libraries);
+            var value = Exitcode.Execute(scope);
             var estr = $"Program terminated at {Token.Line}, {Token.Offset}. Exit code: {value}.";
             var v = scope.Variables["exitcode"];
             if (v == null)

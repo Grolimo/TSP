@@ -114,9 +114,9 @@ namespace Language
             _Value.Type = type;
         }
 
-        public virtual void DoSetValue(dynamic value, Ast_Index index, Ast_Scope scope, Libraries libraries)
+        public virtual void DoSetValue(dynamic value, Ast_Index index, Ast_Scope scope)
         {
-            dynamic idx = ValidateIndex(index, scope, libraries);
+            dynamic idx = ValidateIndex(index, scope);
             ValueType type = ValidateType(ref value);
 
             var ar = _Value.Value;
@@ -184,7 +184,7 @@ namespace Language
             return type;
         }
 
-        private dynamic ValidateIndex(Ast_Index index, Ast_Scope scope, Libraries libraries)
+        private dynamic ValidateIndex(Ast_Index index, Ast_Scope scope)
         {
             if (index == null)
             {
@@ -195,7 +195,7 @@ namespace Language
             {
                 throw new RuntimeError(Token, "Cannot iterate over non iterable variable.");
             }
-            var idx = index.Execute(scope, libraries);
+            var idx = index.Execute(scope);
             return idx;
         }
 
@@ -242,9 +242,9 @@ namespace Language
         {
             return _Value.Value;
         }
-        public dynamic DoGetValue(Ast_Index index, Ast_Scope scope, Libraries libraries)
+        public dynamic DoGetValue(Ast_Index index, Ast_Scope scope)
         {
-            var idx = ValidateIndex(index, scope, libraries);
+            var idx = ValidateIndex(index, scope);
             var ar = _Value.Value;
             foreach (var i in idx)
             {
@@ -270,7 +270,7 @@ namespace Language
             return ar.Value;
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             throw new System.NotImplementedException();
         }

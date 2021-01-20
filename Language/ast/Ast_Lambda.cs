@@ -32,12 +32,12 @@ namespace Language
             return sb.ToString();
         }
 
-        public override dynamic Execute(Ast_Scope scope, Libraries libraries)
+        public override dynamic Execute(Ast_Scope scope)
         {
             throw new NotImplementedException();
         }
 
-        public virtual dynamic ExecuteCall(Ast_Scope scope, Libraries libraries)
+        public virtual dynamic ExecuteCall(Ast_Scope scope)
         {
             throw new NotImplementedException();
         }

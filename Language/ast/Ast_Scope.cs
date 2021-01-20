@@ -36,7 +36,7 @@ namespace Language
 
         public Ast_Scope CreateChild(string name)
         {
-            var scope = new Ast_Scope($"{Name} -> {name}", this);
+            Ast_Scope scope = new Ast_Scope($"{Name} -> {name}", this);
             Children.Add(scope);
             return scope;
         }
