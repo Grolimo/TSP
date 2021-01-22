@@ -8,7 +8,7 @@ namespace Language
 {
     public class Parser
     {
-        private readonly List<string> Keywords = new List<string> { "break", "elif", "else", "foreach", "halt", "if", "unset", "while" };
+        private readonly List<string> Keywords = new List<string> { "break", "elif", "else", "foreach", "halt", "if", "unset", "while", "struct" };
         private readonly List<string> BoolOperands = new List<string> { "and", "not", "or", "xor" };
         private readonly List<string> VariableTypes = new List<string> { "array", "bool", "float", "int", "nil", "record", "string" };
         
@@ -33,16 +33,7 @@ namespace Language
             }
             return token;
         }
-        private static Token Expect(List<TokenType> type, ParserState state)
-        {
-            var token = state.GetToken();
-            if (!type.Contains(token.Type))
-            {
-                throw new SyntaxError(token, string.Format(ste_InvalidTokenType, token.Type));
-            }
-            return token;
-        }
-
+     
         public void GetAst(IAst node, ParserState state)
         {
             var token = state.PeekToken();
@@ -91,7 +82,6 @@ namespace Language
 
         public Ast_Base ParseIdentifier(Token token, ParserState state)
         {
-            //Library lib;
             if (Keywords.Contains(token.Lexeme))
             {
                 return new Ast_Keyword(token);
@@ -121,6 +111,10 @@ namespace Language
                 Ast_Variable ast;
                 if (token.Type == TokenType.Ref)
                 {
+                    if (state.Struct)
+                    {
+                        throw new SyntaxError(token, "Struct definition cannot have ref!");
+                    }
                     token = Expect(TokenType.Identifier, state);
                     ast = new Ast_Variable(token)
                     {
@@ -134,6 +128,10 @@ namespace Language
                 var peek = state.PeekToken();
                 if (peek.Type == TokenType.IndexLeft)
                 {
+                    if (state.Struct)
+                    {
+                        throw new SyntaxError(token, "Struct definition cannot have indexed var assignment!");
+                    }
                     ast.Index = ParseIndex(state);
                 }
                 return ast;
@@ -435,6 +433,10 @@ namespace Language
             {
                 ast = ParseWhile(ident, state);
             }
+            else if (ident.Token.Lexeme == "struct")
+            {
+                ast = ParseStruct(state);
+            }
             else
             {
                 throw new SyntaxError(ident.Token, $"Unexpected keyword {ident.Token.Lexeme}.");
@@ -583,6 +585,57 @@ namespace Language
             };
             var sub = ParseSubBlock(ast, state);
             sub.Name = "while";
+            return ast;
+        }
+        private Ast_Struct ParseStruct(ParserState state)
+        {
+            var structid = Expect(TokenType.Identifier, state);
+            var ast = new Ast_Struct(structid);
+            _ = Expect(TokenType.BlockLeft,state);
+            var token = state.PeekToken();
+            state.Struct = true;
+            while (token.Type != TokenType.BlockRight && !state.EOF)
+            {
+                if (token.Type == TokenType.Comment)
+                {
+                    _ = state.GetToken();  // Comments are ignored, so just gobble it up.
+                    token = state.PeekToken();
+                    continue;
+                }
+                var id = ParseIdentifier(Expect(TokenType.Identifier, state), state);
+                token = state.PeekToken();
+                if (id.Type == AstType.Variable)
+                {
+                    if (token.Type == TokenType.Semicolon)
+                    {
+                        _ =Expect(TokenType.Semicolon,state);
+                        ast.Block.Add(id);
+                    }
+                    else if (token.Type == TokenType.OpAssign)
+                    {
+                        ast.Block.Add(ParseAssign(id, state));
+                    }
+                    else
+                    {
+                        throw new SyntaxError(token,"Invalid syntax for struct field.");
+                    }
+                } 
+                else if (id.Type == AstType.Lambda)
+                {
+                    ast.Block.Add(ParseLambda(id, state));
+                }
+                else
+                {
+                    throw new SyntaxError(token, "Only variables, functions or procedures allowed.");
+                }
+                if (state.EOF)
+                {
+                    throw new SyntaxError(token, "Unexpected end of file.");
+                }
+                token = state.PeekToken();
+            }
+            state.Struct = false;
+            _ = Expect(TokenType.BlockRight, state);
             return ast;
         }
 

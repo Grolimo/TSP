@@ -24,7 +24,7 @@ namespace Language
             {
                 sb.Append($"{arg}, ");
             }
-            if (sb.Length > 2)
+            if (sb.Length > 2 && Args.Count > 0)
             {
                 sb.Remove(sb.Length - 2, 2);
             }

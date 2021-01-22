@@ -34,7 +34,7 @@ namespace Editor
             Console.SetOut(new MultiTextWriter(new ControlWriter(tbOutput), Console.Out));
 
             // For debugging purposes.
-            //LoadFile(Path.Combine(ConfigurationDlg.SourceFiles, "new.tsl"));
+            LoadFile(Path.Combine(ConfigurationDlg.SourceFiles, "new.tsl"));
         }
 
         private static void PersistSourceFolder()

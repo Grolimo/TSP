@@ -9,7 +9,7 @@ namespace Language
         public Ast_Scope Scope = new Ast_Scope("root", null);
         private readonly LexerState State;
         public bool EOF => State.EOF;
-
+        public bool Struct { get; set; }
 
         public ParserState(string source)
         {
@@ -20,6 +20,7 @@ namespace Language
         {
             State.Reset();
             Scope.Clear();
+            Struct = false;
         }
 
         public Token GetToken()

@@ -1,5 +1,10 @@
 #Changelog
 
+22-01-2021 - Updated language.
+
+-> Parsing for struct definition implemented.
+-> Can assign struct to other variables to create a new named struct.
+
 20-01-2021 - Updated language project to Version 0.5.0.2
 
 -> Added this changelog to the solution.

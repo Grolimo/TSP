@@ -30,6 +30,7 @@ namespace Language
         Procedure,
         Record,
         Root,
+        Struct,
         Type,
         Unset,
         Variable,

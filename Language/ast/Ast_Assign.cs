@@ -46,7 +46,7 @@ namespace Language
         public override dynamic Execute(Ast_Scope scope)
         {
             dynamic value = Expression.Execute(scope);
-            if (value is Ast_Procedure || value is Ast_Function)
+            if (value is Ast_Procedure || value is Ast_Function || value is Ast_Struct)
             {
                 value = value.Clone(Variable.Token);
             }

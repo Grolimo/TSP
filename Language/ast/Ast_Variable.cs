@@ -89,6 +89,10 @@ namespace Language
             {
                 return ValueType.Lambda;
             }
+            else if (value is Ast_Struct)
+            {
+                return ValueType.Struct;
+            }
             throw new RuntimeError($"Unknown value type ({value.GetType()}) passed.");
 
         }
