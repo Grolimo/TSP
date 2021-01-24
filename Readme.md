@@ -1,5 +1,5 @@
 # TSP
-The Simple Project
+The Simple Project version 0.5.0.3
 
 The simple project consists of a simple programming language, an editor and a cli interpreter.
 
@@ -7,9 +7,9 @@ Please note that this language isn't intended to be object orientated.
 It can be used for a "functional programming" style.
 
 Variable type is set on assignment.
+Arrays, records, structs, functions and procedures are all copied/cloned on assignment, i.e. it's not a reference but a new instance with the same content
 
 Missing features:
-- Structs.
 - Library/(sub)file inclusion from code.
 - Compiler.
 

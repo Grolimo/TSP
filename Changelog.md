@@ -6,6 +6,7 @@
 -> Can define and execute structs, can assign to struct fields.
 -> Updated Editor to make use of new/modified ToString() overrides on various ASTs.
 -> Deployed new release package.
+-> Bugfix assignment of arrays and records. They are now properly copied/cloned instead of referenced on assignment.
 
 22-01-2021 - Updated language.
 
