@@ -29,6 +29,18 @@ namespace Language
             Type = type;
         }
 
+        public Token Clone()
+        {
+            return new Token()
+            {
+                Line = Line,
+                Offset = Offset,
+                Index = Index,
+                Type = Type,
+                Lexeme = Lexeme
+            };
+        }
+
         public static Token EOFToken => new Token
         {
             Type = EOF

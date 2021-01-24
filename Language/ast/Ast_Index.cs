@@ -3,6 +3,7 @@
 // Licensed under the Mozila Public License, version 2.0.
 
 using System.Collections.Generic;
+using System.Text;
 
 namespace Language
 {
@@ -11,6 +12,17 @@ namespace Language
         public Ast_Index(Token token) : base(token)
         {
             Type = AstType.Index;
+        }
+
+        public string ToString(Ast_Scope scope)
+        {
+            var idx = Execute(scope);
+            var sb = new StringBuilder();
+            foreach (var i in idx)
+            {
+                sb.Append($"[{i}]");
+            }
+            return sb.ToString();
         }
 
         public override dynamic Execute(Ast_Scope scope)

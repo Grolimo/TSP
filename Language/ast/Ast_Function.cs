@@ -29,10 +29,6 @@ namespace Language
             func.ReturnVariable = new Ast_Variable(ReturnVariable.Token);
             return func;
         }
-        public override string ToString()
-        {
-            return $"function {base.ToString()}";
-        }
 
         public override dynamic Execute(Ast_Scope scope)
         {

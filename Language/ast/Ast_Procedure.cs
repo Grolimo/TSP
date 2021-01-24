@@ -27,11 +27,6 @@ namespace Language
             return proc;
         }
 
-        public override string ToString()
-        {
-            return $"procedure {base.ToString()}";
-        }
-
         public override dynamic Execute(Ast_Scope scope)
         {
             scope.Variables.Append(Token.Lexeme, this);

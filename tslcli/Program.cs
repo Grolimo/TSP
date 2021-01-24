@@ -2,10 +2,10 @@
 // Copyright (c) 2021 DiBiAsi Software.
 // Licensed under the Mozila Public License, version 2.0.
 
+using Language;
 using System;
 using System.IO;
 using System.Reflection;
-using Language;
 
 namespace tslcli
 {

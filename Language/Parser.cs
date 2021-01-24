@@ -3,6 +3,7 @@
 // Licensed under the Mozila Public License, version 2.0.
 
 using System.Collections.Generic;
+using System.Text;
 
 namespace Language
 {
@@ -11,7 +12,7 @@ namespace Language
         private readonly List<string> Keywords = new List<string> { "break", "elif", "else", "foreach", "halt", "if", "unset", "while", "struct" };
         private readonly List<string> BoolOperands = new List<string> { "and", "not", "or", "xor" };
         private readonly List<string> VariableTypes = new List<string> { "array", "bool", "float", "int", "nil", "record", "string" };
-        
+
         public readonly Ast_Application Root;
 
         private const string ste_InvalidTokenType = "Invalid token type ({0}).";
@@ -33,7 +34,7 @@ namespace Language
             }
             return token;
         }
-     
+
         public void GetAst(IAst node, ParserState state)
         {
             var token = state.PeekToken();
@@ -80,6 +81,36 @@ namespace Language
             return ast;
         }
 
+        public Ast_Base ResolveStructPart(Token token, ParserState state)
+        {
+            var structPart = token.Clone();
+            var sb = new StringBuilder();
+            sb.Append(token.Lexeme);
+            token = state.PeekToken();
+            while (!state.EOF && token.Type == TokenType.Dot)
+            {
+                sb.Append(token.Lexeme);
+                _ = Expect(TokenType.Dot, state);
+                token = Expect(TokenType.Identifier, state);
+                sb.Append(token.Lexeme);
+                token = state.PeekToken();
+            }
+            structPart.Lexeme = sb.ToString();
+            if (token.Type == TokenType.OpAssignLambda)
+            {
+                return new Ast_Lambda(structPart);
+            }
+            else if (token.Type == TokenType.BracketLeft)
+            {
+                return new Ast_Call(structPart, Libraries);
+            }
+            var ast = new Ast_Variable(structPart);
+            if (token.Type == TokenType.IndexLeft)
+            {
+                ast.Index = ParseIndex(state);
+            }
+            return ast;
+        }
         public Ast_Base ParseIdentifier(Token token, ParserState state)
         {
             if (Keywords.Contains(token.Lexeme))
@@ -105,6 +136,10 @@ namespace Language
             else if (VariableTypes.Contains(token.Lexeme))
             {
                 return new Ast_Type(token);
+            }
+            else if (state.PeekToken().Type == TokenType.Dot)
+            {
+                return ResolveStructPart(token, state);
             }
             else // assume variable.
             {
@@ -137,7 +172,6 @@ namespace Language
                 return ast;
             }
         }
-
         public Ast_Base ParseAssign(Ast_Base ident, ParserState state)
         {
             var token = state.GetToken();
@@ -147,38 +181,54 @@ namespace Language
                 Operand = token,
                 Expression = ParseExpression(TokenType.Semicolon, state)
             };
-            if (!state.Scope.VariableExists(ast.Variable.Name))
+            var ve = state.Scope.VariableExists(ast.Variable.Name);
+            if (!ve)
             {
                 state.Scope.Variables.Add(ast.Variable);
                 if (ast.Expression?.Token?.Lexeme.ToString() == Ast_Variable.RecordValue)
                 {
-                    ast.Variable.DoSetValue(Ast_Variable.NewRecordValue);
+                    ast.Variable.SetValue(new Token() { Lexeme = Ast_Variable.NewRecordValue, Type = TokenType.TypeRecord });
                 }
                 else if (ast.Expression?.Token?.Lexeme.ToString() == Ast_Variable.ArrayValue)
                 {
-                    ast.Variable.DoSetValue(Ast_Variable.NewArrayValue);
+                    ast.Variable.SetValue(new Token() { Lexeme = Ast_Variable.NewArrayValue, Type = TokenType.TypeArray });
                 }
                 else if (ast.Expression?.Token?.Lexeme.ToString() == Ast_Variable.ParamsValue)
                 {
-                    ast.Variable.DoSetValue(Ast_Variable.NewParamsValue);
+                    ast.Variable.SetValue(new Token() { Lexeme = Ast_Variable.NewParamsValue, Type = TokenType.TypeParams });
                 }
                 else if (Ast_Expression.Constants.Contains(ast.Expression.Token.Type))
                 {
-                    ast.Variable.DoSetValue(ast.Expression.Token.Lexeme);
+                    ast.Variable.SetValue(ast.Expression.Token);
+                }
+                else
+                {
+                    ast.Variable.SetValue(token: new Token() { Lexeme = ast.Expression.ToString(), Type = TokenType.Expression });
                 }
             }
             else
             {
                 var v = state.Scope.GetVariable(ast.Variable.Name);
-                if ((v.Value.Type == ValueType.Array || v.Value.Type == ValueType.Record) && ast.Variable.Index == null)
+                if (v == null)
                 {
-                    throw new SyntaxError(token, "Invalid value assignment to iterable variable.");
+                    throw new SyntaxError(token, $"Variable not found {ast.Variable.Name}.");
+                }
+                if (v.Value.Type == ValueType.Record && ast.Variable.Index?.Block.Count > 0 && ast.Variable.Index.Block[^1].Type == AstType.NewArrayIndex)
+                {
+                    throw new SyntaxError(token, "Invalid record index, no index was provided.");
+                }
+                if ((v.Value.Type == ValueType.Array || v.Value.Type == ValueType.Record || v.Value.Type == ValueType.Params) && ast.Variable.Index == null)
+                {
+                    var l = ast.Expression.Block[^1].Token.Lexeme;
+                    if (l != Ast_Variable.ArrayValue && l != Ast_Variable.RecordValue && l != Ast_Variable.ParamsValue)
+                    {
+                        throw new SyntaxError(token, $"Invalid value assignment to iterable variable {v.Name}.");
+                    }
                 }
             }
             _ = Expect(TokenType.Semicolon, state);
             return ast;
         }
-
         public Ast_Base ParseBlock(ParserState state)
         {
             var scope = state.Scope;
@@ -189,7 +239,6 @@ namespace Language
             state.Scope = scope;
             return ast;
         }
-
         public Ast_Scope ParseSubBlock(Ast_Base ast, ParserState state)
         {
             var scope = state.Scope;
@@ -201,7 +250,6 @@ namespace Language
             state.Scope = scope;
             return child;
         }
-
         public Ast_Base ParseCall(Ast_Base ident, ParserState state)
         {
             if (ident?.Type != AstType.Call)
@@ -215,7 +263,6 @@ namespace Language
             _ = Expect(TokenType.Semicolon, state);
             return ast;
         }
-
         private void ParseParameters(Ast_Base ast, ParserState state)
         {
             var terminators = new List<TokenType> { TokenType.BracketRight, TokenType.Comma };
@@ -235,7 +282,6 @@ namespace Language
             }
             _ = Expect(TokenType.BracketRight, state);
         }
-
         public Ast_Index ParseIndex(ParserState state)
         {
             var token = state.PeekToken();
@@ -264,7 +310,6 @@ namespace Language
             }
             return index;
         }
-
         #region Dijkstra, Parsing an expression and convert to reverse Polish.
         private static bool OpPrecedence(KeyValuePair<int, string> left, KeyValuePair<int, string> right)
         {
@@ -277,7 +322,6 @@ namespace Language
             }
             return false;
         }
-
         public Ast_Expression ParseExpression(TokenType Terminator, ParserState state)
         {
             var term = new List<TokenType>
@@ -590,10 +634,15 @@ namespace Language
         private Ast_Struct ParseStruct(ParserState state)
         {
             var structid = Expect(TokenType.Identifier, state);
-            var ast = new Ast_Struct(structid);
-            _ = Expect(TokenType.BlockLeft,state);
-            var token = state.PeekToken();
+            var oldScope = state.Scope;
+            var ast = new Ast_Struct(structid) { StructScope = state.Scope.CreateChild(structid.Lexeme) };
+            ast.StructScope.CanSearchUp = false;
+            state.Scope = ast.StructScope;
             state.Struct = true;
+
+            _ = Expect(TokenType.BlockLeft, state);
+            var token = state.PeekToken();
+
             while (token.Type != TokenType.BlockRight && !state.EOF)
             {
                 if (token.Type == TokenType.Comment)
@@ -608,8 +657,9 @@ namespace Language
                 {
                     if (token.Type == TokenType.Semicolon)
                     {
-                        _ =Expect(TokenType.Semicolon,state);
+                        _ = Expect(TokenType.Semicolon, state);
                         ast.Block.Add(id);
+                        state.Scope.Variables.Add((Ast_Variable)id);
                     }
                     else if (token.Type == TokenType.OpAssign)
                     {
@@ -617,12 +667,14 @@ namespace Language
                     }
                     else
                     {
-                        throw new SyntaxError(token,"Invalid syntax for struct field.");
+                        throw new SyntaxError(token, "Invalid syntax for struct field.");
                     }
-                } 
+                }
                 else if (id.Type == AstType.Lambda)
                 {
-                    ast.Block.Add(ParseLambda(id, state));
+                    var lmd = ParseLambda(id, state);
+                    ast.Block.Add(lmd);
+                    state.Scope.Variables.Append(id.Token.Lexeme.ToString(), lmd);
                 }
                 else
                 {
@@ -636,6 +688,8 @@ namespace Language
             }
             state.Struct = false;
             _ = Expect(TokenType.BlockRight, state);
+            state.Scope = oldScope;
+            oldScope.Variables.Append(ast.Name, ast);
             return ast;
         }
 

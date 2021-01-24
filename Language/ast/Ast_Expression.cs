@@ -32,17 +32,17 @@ namespace Language
             {")", new KeyValuePair<int,string>(0, "left")},
         };
 
-        public static readonly List<TokenType> Operands = new List<TokenType> { 
-            TokenType.OpPower, 
-            TokenType.OpMultiply, 
-            TokenType.OpDivide, 
-            TokenType.OpAdd, 
+        public static readonly List<TokenType> Operands = new List<TokenType> {
+            TokenType.OpPower,
+            TokenType.OpMultiply,
+            TokenType.OpDivide,
+            TokenType.OpAdd,
             TokenType.OpSubtract,
-            TokenType.OpLT, 
-            TokenType.OpLTE, 
-            TokenType.OpGT, 
-            TokenType.OpGTE, 
-            TokenType.OpEqual, 
+            TokenType.OpLT,
+            TokenType.OpLTE,
+            TokenType.OpGT,
+            TokenType.OpGTE,
+            TokenType.OpEqual,
             TokenType.OpNE,
             TokenType.OpNot };
 

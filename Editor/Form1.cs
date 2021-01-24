@@ -6,6 +6,7 @@ using Language;
 using System;
 using System.IO;
 using System.Windows.Forms;
+using ValueType = Language.ValueType;
 
 namespace Editor
 {
@@ -178,14 +179,37 @@ namespace Editor
 
         private void ShowScopeTree(Ast_Scope scope, TreeNode tvn, TreeView tv)
         {
-            TreeNode st = new TreeNode($"scope {scope.Name}");
+            TreeNode st = new TreeNode($"scope {scope}");
             AddScopeNode(st, tvn, tv);
             var nv = st.Nodes.Add("Variables");
             foreach (Ast_Variable v in scope.Variables)
             {
-                nv.Nodes.Add(v.ToString());
+                var varnode = nv.Nodes.Add(v.ToString());
+                if (v.Value.Type == ValueType.Array || v.Value.Type == ValueType.Record || v.Value.Type == ValueType.Params)
+                {
+                    ShowVarArrayTree(v, varnode);
+                }
             }
-            ShowScopeChildren(scope, st, tv);
+            var cn = st.Nodes.Add("Scope");
+            ShowScopeChildren(scope, cn, tv);
+        }
+
+        private static void ShowVarArrayTree(Ast_Variable v, TreeNode tn)
+        {
+            if (v.Value.Type == ValueType.Record)
+            {
+                foreach (var key in v.Value.Value.Keys)
+                {
+                    tn.Nodes.Add($"{v.ToString(key)}");
+                }
+            }
+            else
+            {
+                for (var i = 0; i < v.Value.Value.Count; i++)
+                {
+                    tn.Nodes.Add($"{v.ToString(i)}");
+                }
+            }
         }
 
         private void ShowScopeChildren(Ast_Scope scope, TreeNode st, TreeView tv)

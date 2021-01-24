@@ -46,9 +46,17 @@ namespace Language
         public override dynamic Execute(Ast_Scope scope)
         {
             dynamic value = Expression.Execute(scope);
-            if (value is Ast_Procedure || value is Ast_Function || value is Ast_Struct)
+            if (value is Ast_Procedure procedure)
             {
-                value = value.Clone(Variable.Token);
+                value = procedure.Clone(Variable.Token);
+            }
+            else if (value is Ast_Function function)
+            {
+                value = function.Clone(Variable.Token);
+            }
+            else if (value is Ast_Struct strct)
+            {
+                value = strct.Clone(Variable.Token);
             }
             dynamic index = null;
             if (Variable.Index != null)
@@ -56,12 +64,16 @@ namespace Language
                 index = Variable.Index;
             }
 
-            if (!scope.VariableExists(Variable.Name))
+            Ast_Variable ScopeVar;
+            var ve = scope.VariableExists(Variable.Name);
+            if (!ve)
             {
-                scope.Variables.Append(Variable.Name, value);
+                ScopeVar = scope.Variables.Append(Variable.Name, value);
             }
-
-            var ScopeVar = scope.GetVariable(Variable.Name);
+            else
+            {
+                ScopeVar = scope.GetVariable(Variable.Name);
+            }
 
             if (index != null)
             {

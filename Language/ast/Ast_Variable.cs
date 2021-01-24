@@ -215,31 +215,41 @@ namespace Language
             if (Token == null) return string.Empty;
             var sb = new StringBuilder();
             sb.Append(Token.Lexeme);
-            if (Value != null)
-            {
-                sb.Append($":{Value.Type} ");
-            }
             if (Index != null)
             {
                 foreach (var idx in Index.Block)
                 {
-                    sb.Append($"[{idx}] ");
+                    sb.Append($"[{idx}]");
                 }
             }
-            if ((Value != null)
-                    && (Value.Type != ValueType.Array && Value.Type != ValueType.Record && Value.Type != ValueType.Nil && Value.Value != null))
+            sb.Append($" = {Value.Type.ToString().ToLower()}");
+            if (Value.Type != ValueType.Array && Value.Type != ValueType.Record && Value.Type != ValueType.Params && Value.Value != null)
             {
-                if (Value.Type == ValueType.String)
+                sb.Append($" {Value.Value}");
+            }
+            return sb.ToString();
+        }
+
+        public string ToString(dynamic index)
+        {
+            var idx = index.ToString();
+            var value = Value.Value[index];
+            if (value.Type != ValueType.Array && value.Type != ValueType.Record && value.Type != ValueType.Params && value.Value != null)
+            {
+                if (value.Type == ValueType.String)
                 {
-                    sb.Append($"= \"{Value.Value.ToString()}\"");
+                    return $"{Name}[{idx}] = {value.Type.ToString().ToLower()} \"{value.Value}\"";
                 }
                 else
                 {
-                    sb.Append($"= {Value.Value.ToString()}");
+                    return $"{Name}[{idx}] = {value.Type.ToString().ToLower()} {value.Value}";
                 }
-
             }
-            return sb.ToString().Trim();
+            else if (value.Value != null)
+            {
+                return $"{value.Value}";
+            }
+            return "nil";
         }
 
         public dynamic DoGetValue()
@@ -278,5 +288,44 @@ namespace Language
         {
             throw new System.NotImplementedException();
         }
+
+        public static ValueType TokenTypeToValueType(TokenType type)
+        {
+            return type switch
+            {
+                TokenType.ConstantArray => ValueType.Array,
+                TokenType.ConstantBool => ValueType.Bool,
+                TokenType.ConstantNil => ValueType.Nil,
+                TokenType.ConstantNumber => ValueType.Int,
+                TokenType.ConstantParams => ValueType.Params,
+                TokenType.ConstantRecord => ValueType.Record,
+                TokenType.ConstantString => ValueType.String,
+                TokenType.FormatString => ValueType.FormatString,
+                TokenType.Identifier => ValueType.Any,
+                TokenType.Expression => ValueType.Any,
+                TokenType.TypeArray => ValueType.Array,
+                TokenType.TypeRecord => ValueType.Record,
+                TokenType.Call => ValueType.Call,
+                TokenType.Function => ValueType.Function,
+                TokenType.Procedure => ValueType.Procedure,
+                _ => throw new SyntaxError($"Can't convert token type {type} to valuetype."),
+            };
+        }
+
+        public void SetValue(Token token)
+        {
+            var value = token.Type switch
+            {
+                TokenType.ConstantNil => NilValue,
+                TokenType.TypeArray => new List<VT_Any>(),
+                TokenType.TypeRecord => new Dictionary<string, VT_Any>(),
+                TokenType.TypeParams => new List<VT_Any>(),
+                _ => token.Lexeme,
+            };
+
+            _Value.Value = value;
+            _Value.Type = TokenTypeToValueType(token.Type);
+        }
+
     }
 }

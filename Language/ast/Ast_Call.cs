@@ -10,7 +10,7 @@ namespace Language
     public enum CallType { Function, Procedure, Lambda };
     public class Ast_Call : Ast_Base
     {
-        public CallType CallType {get; set; }
+        public CallType CallType { get; set; }
         private readonly Libraries Libraries;
         public string Name
         {
@@ -47,14 +47,21 @@ namespace Language
         public override dynamic Execute(Ast_Scope scope)
         {
             Ast_Lambda exec;
+            Ast_Scope execScope = scope;
             if (scope.VariableExists(Name))
             {
-                exec = scope.GetVariable(Name).Value.Value;
+                var v = scope.GetVariable(Name);
+                var value = v.Value;
+                exec = value.Value;
+                //if (Name.Contains('.'))
+                //{
+                //    execScope = scope.GetStructScope(Name);
+                //}
             }
             else
             {
                 exec = Libraries.GetMethodOrFunction(Name);
-                exec.Execute(scope); // run the prepwork.
+                exec.Execute(execScope); // run the prepwork.
             }
             if (exec == null)
             {
@@ -72,7 +79,7 @@ namespace Language
             var i = 0;
             foreach (Ast_Expression expr in Block)
             {
-                var expressionValue = expr.Execute(scope);
+                var expressionValue = expr.Execute(execScope);
 
                 if (exec.Args[i].Value.Type == ValueType.Params)
                 {
@@ -88,9 +95,9 @@ namespace Language
 
             if (exec.Type == AstType.Function || exec.Type == AstType.Procedure)
             {
-                return exec.ExecuteCall(scope);
+                return exec.ExecuteCall(execScope);
             }
-            return exec.Execute(scope);
+            return exec.Execute(execScope);
         }
     }
 }

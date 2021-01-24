@@ -21,8 +21,8 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Description>Licensed under the Mozilla Public License, version 2.0.</Description>
     <Copyright>Copyright (c) 2020-2021 Marco Caspers. All Rights Reserved</Copyright>
-    <AssemblyVersion>0.5.0.1</AssemblyVersion>
-    <FileVersion>0.5.0.1</FileVersion>
+    <AssemblyVersion>0.5.0.3</AssemblyVersion>
+    <FileVersion>0.5.0.3</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

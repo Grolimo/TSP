@@ -201,6 +201,10 @@ namespace Language
             {
                 return GetShortComment(state);
             }
+            else if (state.Current == '.')
+            {
+                return GetShortToken(state, Dot);
+            }
             else if (state.Current == ',')
             {
                 return GetShortToken(state, Comma);

@@ -26,6 +26,18 @@ namespace Language
             Name = name;
         }
 
+        public override string ToString()
+        {
+            var str = Name;
+            var curr = this;
+            while (curr.Parent != null)
+            {
+                curr = curr.Parent;
+                str = $"{curr.Name} -> {str}";
+            }
+            return str;
+        }
+
         public void Clear()
         {
             Variables.Clear();
@@ -36,25 +48,74 @@ namespace Language
 
         public Ast_Scope CreateChild(string name)
         {
-            Ast_Scope scope = new Ast_Scope($"{Name} -> {name}", this);
+            Ast_Scope scope = new Ast_Scope(name, this);
             Children.Add(scope);
             return scope;
         }
 
         private Ast_Scope FindScopeByVariableName(string name)
         {
-            var lItem = Variables.FirstOrDefault(i => i.Name == name);
-            if (lItem != null)
+            if (name.Contains('.'))
             {
-                return this;
+                return GetStructScope(name);
             }
-
-            if (Parent != null && CanSearchUp)
+            else
             {
-                return Parent.FindScopeByVariableName(name);
-            }
+                var lItem = Variables.FirstOrDefault(i => i.Name == name);
+                if (lItem != null)
+                {
+                    return this;
+                }
 
-            return null;
+                if (Parent != null && CanSearchUp)
+                {
+                    return Parent.FindScopeByVariableName(name);
+                }
+
+                return null;
+            }
+        }
+
+        public Ast_Scope GetStructScope(string name)
+        {
+            var structName = name.Substring(0, name.IndexOf('.'));
+            var structVar = Variables.FirstOrDefault(v => v.Name == structName);
+            var type = structVar?.Value.Type;
+            var value = structVar?.Value.Value;
+            Ast_Scope structScope = null;
+            if (value != null && type == ValueType.Struct)
+            {
+                structScope = (Ast_Scope)value.StructScope;
+                name = name[(structName.Length + 1)..];
+                while (name.Contains('.') && structVar != null)
+                {
+                    structName = name.Substring(0, name.IndexOf('.') - 1);
+                    structVar = structScope.Variables.FirstOrDefault(v => v.Name == structName);
+                    type = structVar?.Value.Type;
+                    value = structVar?.Value.Value;
+                    if (value != null && type == ValueType.Struct)
+                    {
+                        structScope = (Ast_Scope)value.StructScope;
+                        name = name[(structName.Length + 1)..];
+                    }
+                    else
+                    {
+                        structScope = null;
+                        break;
+                    }
+                }
+            }
+            return structScope;
+        }
+
+        private static string RemoveStructNames(string name)
+        {
+            var sn = name;
+            while (sn.Contains('.'))
+            {
+                sn = sn[(sn.IndexOf('.') + 1)..];
+            }
+            return sn;
         }
 
         public static Ast_Scope GetIteratorScope(Ast_Scope scope)
@@ -75,7 +136,14 @@ namespace Language
         }
         public bool VariableExists(string name)
         {
-            return FindScopeByVariableName(name) != null;
+            if (name.Contains('.'))
+            {
+                return GetStructScope(name) != null;
+            }
+            else
+            {
+                return FindScopeByVariableName(name) != null;
+            }
         }
 
         public Ast_Variable GetVariable(string name, bool showError = true)
@@ -85,7 +153,12 @@ namespace Language
             {
                 throw new SyntaxError($"Variable not found: {name}.");
             }
+            if (name.Contains('.'))
+            {
+                name = RemoveStructNames(name);
+            }
             return scope.Variables[name];
         }
+
     }
 }

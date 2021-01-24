@@ -1,5 +1,12 @@
 #Changelog
 
+24-01-2021 - Updated version 0.5.0.3
+
+-> Completed implementation of struct in language.
+-> Can define and execute structs, can assign to struct fields.
+-> Updated Editor to make use of new/modified ToString() overrides on various ASTs.
+-> Deployed new release package.
+
 22-01-2021 - Updated language.
 
 -> Parsing for struct definition implemented.
