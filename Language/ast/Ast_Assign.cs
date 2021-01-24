@@ -2,6 +2,7 @@
 // Copyright (c) 2021 DiBiAsi Software.
 // Licensed under the Mozila Public License, version 2.0.
 
+using System.Collections.Generic;
 using System.Text;
 
 namespace Language
@@ -43,6 +44,26 @@ namespace Language
             return sb.ToString();
         }
 
+        private static List<VT_Any> CloneArray(List<VT_Any> value)
+        {
+            var result = new List<VT_Any>();
+            foreach(var v in value)
+            {
+                result.Add(new VT_Any() { Type = v.Type, Value = v.Value });
+            }
+            return result;
+        }
+
+        private static Dictionary<string, VT_Any> CloneRecord(Dictionary<string, VT_Any> value)
+        {
+            var result = new Dictionary<string, VT_Any>();
+            foreach(var i in value.Keys)
+            {
+                result.Add(i, new VT_Any() { Type = value[i].Type, Value = value[i].Value } );
+            }
+            return result;
+        }
+
         public override dynamic Execute(Ast_Scope scope)
         {
             dynamic value = Expression.Execute(scope);
@@ -58,6 +79,15 @@ namespace Language
             {
                 value = strct.Clone(Variable.Token);
             }
+            else if (value is List<VT_Any>)
+            {
+                value = CloneArray(value);
+            }
+            else if (value is Dictionary<string, VT_Any>)
+            {
+                value = CloneRecord(value);
+            }
+
             dynamic index = null;
             if (Variable.Index != null)
             {

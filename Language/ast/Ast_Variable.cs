@@ -314,7 +314,13 @@ namespace Language
 
         public void SetValue(Token token)
         {
-            var value = token.Type switch
+            _Value.Value = Ast_Variable.TokenToValue(token);
+            _Value.Type = TokenTypeToValueType(token.Type);
+        }
+
+        private static dynamic TokenToValue(Token token)
+        {
+            return token.Type switch
             {
                 TokenType.ConstantNil => NilValue,
                 TokenType.TypeArray => new List<VT_Any>(),
@@ -322,9 +328,53 @@ namespace Language
                 TokenType.TypeParams => new List<VT_Any>(),
                 _ => token.Lexeme,
             };
+        }
 
-            _Value.Value = value;
-            _Value.Type = TokenTypeToValueType(token.Type);
+        public void SetValue(Token token, Ast_Index index, Ast_Scope scope)
+        {
+            dynamic idx = ValidateIndex(index, scope);
+            ValueType type = TokenTypeToValueType(token.Type);
+
+            var ar = _Value.Value;
+            foreach (var i in idx)
+            {
+                if (ar is Dictionary<string, VT_Any> && i is string && !ar.ContainsKey(i))
+                {
+                    ar.Add(i, new VT_Any());
+                    ar = ar[i];
+                    break;
+                }
+                if (ar is List<VT_Any> && i is string)
+                {
+                    if (i == NewArrayIndex)
+                    {
+                        ar.Add(new VT_Any());
+                        ar = ar[ar.Count - 1];
+                        break;
+                    }
+                    else
+                    {
+                        throw new RuntimeError(Token, "Invalid indexer type.");
+                    }
+                }
+
+                if (
+                        (ar is List<VT_Any> && i >= ar.Count)
+                        || (ar is string && (i >= ar.Length || i < 0))
+                   )
+                {
+                    throw new RuntimeError(Token, "E: Index out of range.");
+                }
+
+                if (ar is VT_Any && ar.Value is string)
+                {
+                    ar.Value[index] = Ast_Variable.TokenToValue(token);
+                    return;
+                }
+                ar = ar[i];
+            }
+            ar.Value = Ast_Variable.TokenToValue(token);
+            ar.Type = type;
         }
 
     }
